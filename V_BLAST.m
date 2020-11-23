@@ -71,26 +71,29 @@ nb_err = 0;
 for i_snr = 1:length(EbN0)
     
     i_snr
-    varv = sigma2(i_snr)
+    varv = sigma2(i_snr);
     nb_bits_sent = 0;
     nb_err = 0;
     cmp = 0;
     while (nb_err < nbr_erreur_cap)
         cmp = cmp +1;
         %% chaine de com
-        for i=1:nb_mdc
+%         for i=1:nb_mdc
 
 
             %% emission
-            b = randi([0,1],K,1);    % Generation du message al�atoire
-
-            x_stream = mod_psk(b);
-
-            %% attention, voilà le gros encodage spatiotemporel de la mort qui tue V_BLAST
-            meta_X = reshape(x_stream, N, []); % la première 2x2 = le premier mdc=X, il y a nb_mdc matrices 2x2
-            % Voila
-
-            X = meta_X(1:2, i:i+L-1);
+%             b = randi([0,1],K,1);    % Generation du message al�atoire
+% 
+%             x_stream = mod_psk(b);
+% 
+%             %% attention, voilà le gros encodage spatiotemporel de la mort qui tue V_BLAST
+%             meta_X = reshape(x_stream, N, []); % la première 2x2 = le premier mdc=X, il y a nb_mdc matrices 2x2
+%             % Voila
+% 
+%             X = meta_X(1:2, i:i+L-1);
+            
+            rand_imdc = randi([1,256], 1,1);
+            X = C(:,:,rand_imdc);
 
             %% canal
             H = sqrt(varv/2)*(randn(M,N) + 1i*randn(M,N));
@@ -116,8 +119,8 @@ for i_snr = 1:length(EbN0)
             X_chap = C(:,:,i_min);
 
             nb_err = nb_err + any((X_chap ~= X), 'all'); % c'est pas un taux d'erreur binaire c'est un taux d'erreur mdc
-        end
-        nb_bits_sent = cmp*nb_mdc;
+%         end
+        nb_bits_sent = nb_bits_sent + cmp;
         nb_errs(i_snr) = nb_err;
         ber(i_snr)= nb_errs(i_snr)/nb_bits_sent;
     end
